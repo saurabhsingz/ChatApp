@@ -34,10 +34,10 @@ const adminTabs = [
   { name: "Dashboard", path: "/admin/dashboard", icon: <DashboardIcon /> },
   {
     name: "Users",
-    path: "/admin/users-management",
+    path: "/admin/users",
     icon: <ManageAccountsIcon />,
   },
-  { name: "Chats", path: "/admin/chats-management", icon: <GroupsIcon /> },
+  { name: "Chats", path: "/admin/chats", icon: <GroupsIcon /> },
   { name: "Messages", path: "/admin/messages", icon: <MessageIcon /> },
 ];
 
@@ -49,7 +49,7 @@ const Sidebar = ({ w = "100%" }) => {
   };
 
   return (
-    <Stack width={w} spacing={"3rem"} p={"3rem"}>
+    <Stack width={w} spacing={"3rem"} p={"3rem 1rem"}>
       <Typography variant="h5" textTransform={"uppercase"}>
         Admin
       </Typography>

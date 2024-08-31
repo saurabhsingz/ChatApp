@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { bgGradient } from "../../constants/Color";
 import { validateSecretKey } from "../../utils/Validator";
@@ -31,9 +31,11 @@ const AdminLogin = () => {
   };
 
   const navigate = useNavigate();
-  if (isAdmin) {
-    return navigate("/admin/dashboard");
-  }
+  useEffect(() => {
+    if (isAdmin) {
+      return navigate("/admin/dashboard");
+    }
+  }, []);
 
   return (
     <div style={{ background: bgGradient }}>

@@ -38,11 +38,9 @@ const App = () => {
           />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/users-management" element={<UserManagement />} />
-          <Route
-            path="/admin/messages-management"
-            element={<MessageManagement />}
-          />
+          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/chats" element={<ChatManagement />} />
+          <Route path="/admin/messages" element={<MessageManagement />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
