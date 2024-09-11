@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import { User } from "../models/userModel.js";
 import { sendToken } from "../utils/features.js";
+import { ErrorHandler, TryCatch } from "../utils/utility.js";
 
 const newUser = async (req, res) => {
   const { name, username, password, bio } = req.body;
@@ -17,23 +18,26 @@ const newUser = async (req, res) => {
   sendToken(res, user, 201, "user created");
 };
 
-const login = async (req, res) => {
+const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
 
   const user = await User.findOne({ username }).select("+password");
 
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found" });
+    return next(new ErrorHandler("User not found", 404));
   }
 
-  const isMatch = user && (await compare(password, user.password));
+  const isMatch = await compare(password, user.password);
   if (!isMatch) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid credentials" });
+    return next(new ErrorHandler("Invalid credentials", 401));
   }
 
   sendToken(res, user, 200, `Welcome back ${user.name}`);
+});
+
+const getMyProfile = async (req, res) => {
+  console.log("hii");
+  res.status(200).json({ success: true, data: req.user });
 };
 
-export { login, newUser };
+export { login, newUser, getMyProfile };
