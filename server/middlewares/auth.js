@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ErrorHandler, TryCatch } from "../utils/utility.js";
 
-const isAuthenticated = TryCatch(async (req, res, next) => {
+const isAuthenticated = (req, res, next) => {
   const token = req.cookies.chatToken;
 
   if (!req.cookies.chatToken) {
@@ -13,5 +13,5 @@ const isAuthenticated = TryCatch(async (req, res, next) => {
   req.user = decodedData.id;
 
   next();
-});
+};
 export { isAuthenticated };

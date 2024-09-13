@@ -1,6 +1,6 @@
 import { compare } from "bcrypt";
 import { User } from "../models/userModel.js";
-import { sendToken } from "../utils/features.js";
+import { cookieOptions, sendToken } from "../utils/features.js";
 import { ErrorHandler, TryCatch } from "../utils/utility.js";
 
 const newUser = async (req, res) => {
@@ -35,9 +35,16 @@ const login = TryCatch(async (req, res, next) => {
   sendToken(res, user, 200, `Welcome back ${user.name}`);
 });
 
-const getMyProfile = async (req, res) => {
-  console.log("hii");
-  res.status(200).json({ success: true, data: req.user });
-};
+const getMyProfile = TryCatch(async (req, res) => {
+  const user = await User.findById(req.user);
+  res.status(200).json({ success: true, data: user });
+});
 
-export { login, newUser, getMyProfile };
+const logout = TryCatch(async (req, res) => {
+  return res
+    .status(200)
+    .cookie("chatToken", "", { ...cookieOptions, maxAge: 0 })
+    .json({ success: true, message: "Logged out successfully" });
+});
+
+export { login, newUser, getMyProfile, logout };
