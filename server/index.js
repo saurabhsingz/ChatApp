@@ -1,10 +1,13 @@
 import express from "express";
-import userRoute from "./routes/userRoutes.js";
 import dotenv from "dotenv";
 import { connectDB } from "./utils/features.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import { isAuthenticated } from "./middlewares/auth.js";
+
+import userRoutes from "./routes/userRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import { createUser } from "./Seeder/userSeeder.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -21,7 +24,8 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.use("/user", userRoute);
+app.use("/user", userRoutes);
+app.use("/chat", chatRoutes);
 
 app.use(errorMiddleware);
 

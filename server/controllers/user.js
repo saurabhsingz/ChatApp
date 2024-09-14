@@ -37,7 +37,7 @@ const login = TryCatch(async (req, res, next) => {
 
 const getMyProfile = TryCatch(async (req, res) => {
   const user = await User.findById(req.user);
-  res.status(200).json({ success: true, data: user });
+  return res.status(200).json({ success: true, data: user });
 });
 
 const logout = TryCatch(async (req, res) => {
@@ -49,6 +49,7 @@ const logout = TryCatch(async (req, res) => {
 
 const searchUser = TryCatch(async (req, res) => {
   const { name } = req.query;
+
   return res.status(200).json({ success: true, message: name });
 });
 
