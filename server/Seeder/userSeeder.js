@@ -18,7 +18,7 @@ const createUser = async (numUser) => {
         })
       );
     }
-    await Promise.all(userPromise);
+    // await Promise.all(userPromise);
     console.log("users created", numUser);
   } catch (error) {
     console.log("error in user creation", error);
