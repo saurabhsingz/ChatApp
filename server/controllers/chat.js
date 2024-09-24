@@ -254,6 +254,82 @@ const sendAttachment = TryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, message });
 });
 
+const getChatDetails = TryCatch(async (req, res, next) => {
+  if (req.query.populate === "true") {
+    const chat = await Chat.findById(req.params.id)
+      .populate("members", "name avatar")
+      .lean();
+    if (!chat) {
+      return next(new ErrorHandler("Chat not found", 404));
+    }
+    chat.members = chat.members.map(({ _id, name, avatar }) => ({
+      _id,
+      name,
+      avatar: avatar.url,
+    }));
+
+    return res.status(200).json({ success: true, chat });
+  } else {
+    const chat = await Chat.findById(req.params.id);
+    if (!chat) {
+      return next(new ErrorHandler("Chat not found", 404));
+    }
+    return res.status(200).json({ success: true, chat });
+  }
+});
+
+const renameGroup = TryCatch(async (req, res, next) => {
+  const chatId = req.params.id;
+  const { name } = req.body;
+  const chat = await Chat.findById(chatId);
+
+  if (!chat) {
+    return next(new ErrorHandler("Chat not found", 404));
+  }
+
+  if (!chat.groupChat) {
+    return next(new ErrorHandler("This is not a group chat", 400));
+  }
+
+  if (chat.creator.toString() !== req.user.toString()) {
+    return next(new ErrorHandler("You are not allowed to rename group", 403));
+  }
+
+  chat.name = name;
+  await chat.save();
+
+  emitEvent(req, REFETCH_CHATS, chat.members);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Group name updated successfully" });
+});
+
+const deleteChat = TryCatch(async (req, res, next) => {
+  const chatId = req.params.id;
+  const chat = await Chat.findById(chatId);
+
+  if (!chat) {
+    return next(new ErrorHandler("Chat not found", 404));
+  }
+
+  if (chat.groupChat && chat.creator.toString() !== req.user.toString()) {
+    return next(new ErrorHandler("You are not allowed to delete chat", 403));
+  }
+
+  if (chat.groupChat && !chat.members.includes(req.user.toString())) {
+    return next(new ErrorHandler("You are not a member of this group", 403));
+  }
+
+  await chat.remove();
+
+  emitEvent(req, REFETCH_CHATS, chat.members);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Chat deleted successfully" });
+});
+
 export {
   newGroupChat,
   getMyChats,
@@ -262,4 +338,6 @@ export {
   removeMember,
   leaveGroup,
   sendAttachment,
+  getChatDetails,
+  renameGroup,
 };

@@ -2,11 +2,13 @@ import express from "express";
 import { isAuthenticated } from "../middlewares/auth.js";
 import {
   addMembers,
+  getChatDetails,
   getMyChats,
   getMyGroups,
   leaveGroup,
   newGroupChat,
   removeMember,
+  renameGroup,
   sendAttachment,
 } from "../controllers/chat.js";
 import { attachmentMulter } from "../middlewares/multer.js";
@@ -23,5 +25,8 @@ app.delete("/leave/:id", leaveGroup);
 
 //Send attachments
 app.post("/message", attachmentMulter, sendAttachment);
+
+//get chat details, rename and details
+app.route("/:id").get(getChatDetails).put(renameGroup).delete();
 
 export default app;
