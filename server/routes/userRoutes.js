@@ -16,6 +16,6 @@ app.post("/login", login);
 app.use(isAuthenticated);
 app.get("/profile", getMyProfile);
 app.get("/logout", logout);
-app.get("/searchuser", searchUser);
+app.get("/", searchUser);
 
 export default app;
