@@ -8,7 +8,7 @@ import { getOtherMember } from "../lib/helper.js";
 import { Chat } from "../models/chatModel.js";
 import { User } from "../models/userModel.js";
 import { Message } from "../models/messageModel.js";
-import { emitEvent } from "../utils/features.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
 import { ErrorHandler, TryCatch } from "../utils/utility.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
@@ -321,13 +321,35 @@ const deleteChat = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("You are not a member of this group", 403));
   }
 
-  await chat.remove();
+  //here we have to delete all messages and attachments related to this chat from cloudinary
+  const messagesWithAttachments = await Message.find({
+    chat: chatId,
+    attachments: { $exists: true, $ne: [] },
+  });
+
+  const public_ids = [];
+
+  messagesWithAttachments.forEach(({ attachments }) => {
+    attachments.forEach(({ public_id }) => {
+      public_ids.push(public_id);
+    });
+  });
+
+  await Promise.all([
+    deleteFilesFromCloudinary(public_ids),
+    chat.deleteOne(),
+    Message.deleteMany({ chat: chatId }),
+  ]);
 
   emitEvent(req, REFETCH_CHATS, chat.members);
 
   return res
     .status(200)
     .json({ success: true, message: "Chat deleted successfully" });
+});
+
+const getMessages = TryCatch(async (req, res, next) => {
+  const chatId = req.params.id;
 });
 
 export {
@@ -340,4 +362,6 @@ export {
   sendAttachment,
   getChatDetails,
   renameGroup,
+  deleteChat,
+  getMessages,
 };
