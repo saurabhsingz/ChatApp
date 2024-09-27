@@ -7,7 +7,7 @@ import { isAuthenticated } from "./middlewares/auth.js";
 
 import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
-import { createUser } from "./Seeder/userSeeder.js";
+import { createMessagesInAChat } from "./Seeder/chatSeeder.js";
 
 dotenv.config({ path: "./.env" });
 
