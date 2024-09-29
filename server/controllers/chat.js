@@ -355,7 +355,7 @@ const getMessages = TryCatch(async (req, res, next) => {
   const skip = (page - 1) * messagePerPage;
 
   const [messages, totalMessagesCount] = await Promise.all([
-    Message.findOne({ chat: chatId })
+    Message.find({ chat: chatId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(messagePerPage)
@@ -364,7 +364,7 @@ const getMessages = TryCatch(async (req, res, next) => {
     Message.countDocuments({ chat: chatId }),
   ]);
 
-  const totalPages = Math.ceil(totalMessagesCount / messagePerPage);
+  const totalPages = Math.ceil(totalMessagesCount / messagePerPage) || 0;
 
   return res
     .status(200)
