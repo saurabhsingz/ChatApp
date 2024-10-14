@@ -17,7 +17,6 @@ const registerValidator = () => [
   body("username", "Please Enter Username").notEmpty(),
   body("password", "Please Enter Password").notEmpty(),
   body("bio", "Please Enter Bio").notEmpty(),
-  check("avatar", "Please Upload Avatar").notEmpty(),
 ];
 
 const loginValidator = () => [
@@ -50,11 +49,6 @@ const leaveGroupValidator = () => [
 
 const sendAttachmentValidator = () => [
   body("chatId", "Please Enter chatId").notEmpty(),
-  body("files")
-    .notEmpty()
-    .withMessage("Please Upload Files")
-    .isArray({ min: 1, max: 5 })
-    .withMessage("Attachment must be 1-5 files"),
 ];
 
 const chatIdValidator = () => [param("id", "Please Enter chatId").notEmpty()];
@@ -77,6 +71,10 @@ const requestResponseValidator = () => [
     .withMessage("Accept must be boolean"),
 ];
 
+const adminLoginValidator = () => [
+  body("secretKey", "Please Enter Secret Key").notEmpty(),
+];
+
 export {
   registerValidator,
   validateHandler,
@@ -90,4 +88,5 @@ export {
   renameValidator,
   requestValidator,
   requestResponseValidator,
+  adminLoginValidator,
 };

@@ -7,8 +7,10 @@ import { Request } from "../models/requestModel.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.js";
 import { getOtherMember } from "../lib/helper.js";
 
-const newUser = async (req, res, next) => {
+const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
+
+  if (!req.file) return next(new ErrorHandler("Please upload an avatar", 400));
 
   const avatar = { public_id: "123", url: "https://www.google.com" };
   const user = await User.create({
@@ -20,8 +22,7 @@ const newUser = async (req, res, next) => {
   });
 
   sendToken(res, user, 201, "user created");
-};
-
+});
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
 
@@ -146,7 +147,7 @@ const acceptRequest = TryCatch(async (req, res, next) => {
   });
 });
 
-const getAllNotifications = TryCatch(async (req, res) => {
+const getMyNotifications = TryCatch(async (req, res) => {
   const requests = await Request.find({ receiver: req.user }).populate(
     "sender",
     "name avatar"
@@ -202,6 +203,6 @@ export {
   searchUser,
   sendRequest,
   acceptRequest,
-  getAllNotifications,
+  getMyNotifications,
   getMyFriends,
 };
