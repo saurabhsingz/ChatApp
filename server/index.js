@@ -11,7 +11,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 import { createMessagesInAChat } from "./Seeder/chatSeeder.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { NEW_MESSAGE } from "./constants/event.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
+import { v4 as uuid } from "uuid";
+import { getSockets } from "./lib/helper.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -19,6 +21,7 @@ const mongoURI = process.env.MONGO_URI;
 const PORT = process.env.PORT;
 const envMode = process.env.NODE_ENV || "PRODUCTION";
 const adminSecretKey = process.env.ADMIN_SECRET_KEY || "randomSecretKey";
+const userSocketIDs = new Map();
 
 connectDB(mongoURI);
 
@@ -38,14 +41,45 @@ app.use("/chat", chatRoutes);
 app.use("/admin", adminRoutes);
 
 io.on("connection", (socket) => {
-  console.log("User connected", socket.id);
+  const user = {
+    _id: "abc",
+    name: "Subh",
+  };
+
+  userSocketIDs.set(user._id.toString(), socket.id);
+  console.log("User connected", userSocketIDs);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
-    console.log("New Message");
+    const messageForRealTime = {
+      content: messages,
+      _id: uuid(),
+      sender: {
+        _id: user._id,
+        name: user.name,
+      },
+      chat: chatId,
+      createdAt: new Date().toISOString(),
+    };
+
+    const messageForDB = {
+      content: messages,
+      sender: user._id,
+      chat: chatId,
+    };
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(NEW_MESSAGE, {
+      chatId,
+      message: messageForRealTime,
+    });
+    io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
+
+    console.log("New Message", messageForRealTime);
   });
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
+    userSocketIDs.delete(user._id.toString());
   });
 });
 
@@ -55,4 +89,4 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} in ${envMode} mode`);
 });
 
-export { envMode, adminSecretKey };
+export { envMode, adminSecretKey, userSocketIDs };
