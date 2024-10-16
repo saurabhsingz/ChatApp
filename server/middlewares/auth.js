@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { ErrorHandler, TryCatch } from "../utils/utility.js";
 import { adminSecretKey } from "../index.js";
 
-const isAuthenticated = (req, res, next) => {
+const isAuthenticated = TryCatch((req, res, next) => {
   const token = req.cookies.chatToken;
 
   if (!req.cookies.chatToken) {
@@ -13,7 +13,7 @@ const isAuthenticated = (req, res, next) => {
   req.user = decodedData.id;
 
   next();
-};
+});
 
 const adminOnly = (req, res, next) => {
   const token = req.cookies["chat-admin-token"];
