@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { v4 as uuid } from "uuid";
 
 const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
@@ -32,6 +33,26 @@ const emitEvent = (req, event, users, data) => {
   console.log("emitting event", event);
 };
 
+const uploadFilesToCloudinary = async (files = []) => {
+  const uploadPromises = files.map((file) => {
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(
+        file.path,
+        {
+          resource_type: "auto",
+          public_id: uuid(),
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          }
+          resolve(result);
+        }
+      );
+    });
+  });
+};
+
 const deleteFilesFromCloudinary = async (publicIds) => {
   //delete files from cloudinary
 };
@@ -42,4 +63,5 @@ export {
   cookieOptions,
   emitEvent,
   deleteFilesFromCloudinary,
+  uploadFilesToCloudinary,
 };

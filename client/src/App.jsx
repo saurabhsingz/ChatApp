@@ -4,6 +4,9 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LayoutLoader from "./components/layout/Loaders";
 import { server } from "./constants/config";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { userNotExists } from "./redux/reducers/auth";
+import { Toaster } from "react-hot-toast";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -17,9 +20,10 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const MessageManagement = lazy(() => import("./pages/admin/MessageManagement"));
 const ChatManagement = lazy(() => import("./pages/admin/ChatManagement"));
 
-let user = true;
-
 const App = () => {
+  const { user, loader } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     axios
       .get(`${server}/api/v1/user/profile`)
@@ -27,11 +31,13 @@ const App = () => {
         console.log(res);
       })
       .catch((err) => {
-        console.log(err);
+        dispatch(userNotExists());
       });
-  }, []);
+  }, [dispatch]);
 
-  return (
+  return loader ? (
+    <LayoutLoader />
+  ) : (
     <Router>
       <Suspense fallback={<LayoutLoader />}>
         <Routes>
@@ -57,6 +63,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      <Toaster position="bottom-center" />
     </Router>
   );
 };
