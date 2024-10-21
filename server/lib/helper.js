@@ -6,4 +6,7 @@ const getOtherMember = (members, userId) =>
 const getSockets = (users = []) =>
   users.map((user) => userSocketIDs.get(user._id.toString()));
 
-export { getOtherMember, getSockets };
+const getBase64 = (file) =>
+  `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+
+export { getOtherMember, getSockets, getBase64 };

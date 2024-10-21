@@ -17,10 +17,11 @@ const newUser = TryCatch(async (req, res, next) => {
 
   const file = req.file;
   if (!file) return next(new ErrorHandler("Please upload an avatar", 400));
-
   const result = await uploadFilesToCloudinary([file]);
 
-  const avatar = { public_id: result[0].public_id, url: result[0].secureUrl };
+  console.log(result);
+
+  const avatar = { public_id: result[0].public_id, url: result[0].url };
   const user = await User.create({
     name,
     username,
@@ -54,7 +55,7 @@ const getMyProfile = TryCatch(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User not found", 404));
   }
-  return res.status(200).json({ success: true, data: user });
+  return res.status(200).json({ success: true, user: user });
 });
 
 const logout = TryCatch(async (req, res) => {

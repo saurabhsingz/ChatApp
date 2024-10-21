@@ -22,6 +22,7 @@ import { server } from "../constants/config";
 import { useDispatch } from "react-redux";
 import { userExists } from "../redux/reducers/auth";
 import toast from "react-hot-toast";
+import { useFileHandler } from "6pp";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,7 +30,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  // const [avatar, setAvatar] = useState(null);
+  const avatar = useFileHandler("single");
   const [nameError, setNameError] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -84,6 +86,9 @@ const Login = () => {
     formData.append("password", password);
     formData.append("bio", bio);
     formData.append("avatar", avatar.file);
+    console.log(avatar, avatar.file);
+
+    console.log(avatar);
 
     const config = {
       headers: {
@@ -199,7 +204,7 @@ const Login = () => {
                       height: "10rem",
                       objectFit: "contain",
                     }}
-                    src={avatar}
+                    src={avatar.preview}
                   />
 
                   <IconButton
@@ -219,12 +224,24 @@ const Login = () => {
                       <VisuallyHiddenInput
                         type="file"
                         accept="image/*"
-                        onChange={avatarHandler}
+                        onChange={avatar.changeHandler}
                       />
                       <CameraAltIcon />
                     </>
                   </IconButton>
                 </Stack>
+
+                {avatar.error && (
+                  <Typography
+                    m={"1rem auto"}
+                    width={"fit-content"}
+                    display={"block"}
+                    color="error"
+                    variant="caption"
+                  >
+                    {avatar.error}
+                  </Typography>
+                )}
 
                 <TextField
                   required
