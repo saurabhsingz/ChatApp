@@ -96,6 +96,7 @@ const sendRequest = TryCatch(async (req, res, next) => {
       { sender: receiverId, receiver: req.user },
     ],
   });
+  ``;
 
   if (request) {
     return next(new ErrorHandler("Request already sent", 400));
